@@ -72,12 +72,23 @@ textarea {
 
 .past-event{
   background-color: #CCC;
+  border-left: 4px solid #999;
 }
 
 .current-event{
   background-color: #F14D57;
+  border-left: 4px solid #B43941;
 }
 
 .future-event{
   background-color: #74E96F;
+  border-left: 4px solid #57AE53;
+}
+
+.past-event-time{
+  padding-right: 5px;
+}
+
+.future-event-time{
+  padding-right: 10px;
 }
