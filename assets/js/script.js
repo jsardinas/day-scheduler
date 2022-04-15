@@ -5,7 +5,7 @@ $(document).ready(()=>{
     console.log(now);
     currentDayElement.text(now.format("dddd, MMMM Do YYYY"));
     let tb = $('.time-blocks');
-    for(let i = 9, hour = moment("09:00:00", "hh:mm:ss"); i < 26; ++i, hour.add(1,'hours')){
+    for(let i = 0, hour = moment("00:00:00", "hh:mm:ss"); i < 24; ++i, hour.add(1,'hours')){
         let dayRow = $('<div>');
         dayRow.addClass('row');
 
@@ -36,6 +36,14 @@ $(document).ready(()=>{
         lastCol.css('background-color', '#0EB0CB');
         lastCol.css('border-left', '4px solid #0A8498');
         lastCol.css('border-radius', '0px 10px 10px 0px');
+        lastCol.css('display', 'flex');
+        lastCol.css('justify-content', 'center');
+        lastCol.css('align-items', 'center');
+        lastCol.css('color', 'white');
+
+        let saveIcon = $('<i>');
+        saveIcon.addClass('far fa-save');
+        lastCol.append(saveIcon);
 
         [timeCol, eventCol, lastCol].forEach(x=>dayRow.append(x))
         tb.append(dayRow);
