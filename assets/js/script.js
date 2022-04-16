@@ -93,6 +93,7 @@ $(document).ready(()=>{
     }
 
     setUpdater();    
+    window.setTimeout(updateSlots, 3000);
 });
 
 function saveItem(event){
@@ -122,6 +123,7 @@ function setUpdater(){
 }
 
 function updateSlots(){
+    console.log('update');
     let eventSlots = $('.event');
     classList = ['past', 'present', 'future'];
     for(item of eventSlots){
@@ -131,13 +133,17 @@ function updateSlots(){
                 $(item).removeClass(c);
         let now = moment().format('HH');
         let hour = $(item).attr('hour');
-        console.log(now, hour);
-        if (now < hour)
+        if (now < hour){
             $(item).addClass('future')
-        else if (now < hour+1)
-            $(item).addClass('present');
-        else
-            $(item).addClass('past');
+            $(`textarea[hour=${hour}]`).prop('disabled', false);
+        }
+        else {
+            if (now < hour+1)
+                $(item).addClass('present');
+            else
+                $(item).addClass('past');
+            $(`textarea[hour=${hour}]`).prop('disabled', true);
+        }
     }
     setUpdater();
 }
