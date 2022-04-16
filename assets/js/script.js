@@ -7,8 +7,9 @@ var today;
 $(document).ready(()=>{
     
     var now = moment();
-    today = now.format('YYYYMMDD');
+    currentDayElement.text(now.format("dddd, MMMM Do YYYY"));
 
+    today = now.format('YYYYMMDD');
     schedule = JSON.parse(window.localStorage.getItem('schedule'));
     if (schedule === null){
         schedule = {};
@@ -27,10 +28,7 @@ $(document).ready(()=>{
             schedule[today]={};
         }
     }
-    console.log(schedule);
     window.localStorage.setItem('schedule', JSON.stringify(schedule));
-   
-    currentDayElement.text(now.format("dddd, MMMM Do YYYY"));
     
     let tb = $('.time-blocks');
     for(let i = 0, hour = moment("00:00:00", "hh:mm:ss"); i < 24; ++i, hour.add(1,'hours')){
@@ -40,15 +38,17 @@ $(document).ready(()=>{
         let timeCol = $('<div>');
         timeCol.addClass('col-1');
         timeCol.addClass('hour');
-        let timeVal = hour.format('hA') 
+        let timeVal = hour.format('hA');
+        let timeKey = hour.format('HH');
         timeCol.text(timeVal);
 
         let eventCol = $('<div>');
-        eventCol.addClass('col-10');
+        eventCol.addClass('col-10 event');
+        eventCol.attr('hour', timeKey);
         let eventInput = $('<textarea>');
-        eventInput.attr('hour', timeVal);
-        if (schedule[today][timeVal] !== undefined)
-            eventInput.text(schedule[today][timeVal]);
+        eventInput.attr('hour', timeKey);
+        if (schedule[today][timeKey] !== undefined)
+            eventInput.text(schedule[today][timeKey]);
 
         eventInput.focus((event)=>{
             event.preventDefault();
@@ -83,7 +83,7 @@ $(document).ready(()=>{
         lastCol.addClass('saveBtn');
 
         let saveIcon = $('<i>');
-        saveIcon.attr('hour', timeVal);
+        saveIcon.attr('hour', timeKey);
         saveIcon.addClass('far fa-save');
         saveIcon.click(saveItem);
         lastCol.append(saveIcon);
@@ -91,6 +91,8 @@ $(document).ready(()=>{
         [timeCol, eventCol, lastCol].forEach(x=>dayRow.append(x))
         tb.append(dayRow);
     }
+
+    setUpdater();    
 });
 
 function saveItem(event){
@@ -111,3 +113,31 @@ function removeText(target) {
         target.css('opacity', '100%');
     });
   }
+
+function setUpdater(){
+    var now = moment();
+    var next = moment().startOf('hour').add(1,'hour');
+    var start = next - now;
+    window.setTimeout(updateSlots, start);
+}
+
+function updateSlots(){
+    let eventSlots = $('.event');
+    classList = ['past', 'present', 'future'];
+    for(item of eventSlots){
+        var cl = $(item).attr('class').split(' ');
+        for(c of cl)
+            if (classList.includes(c))
+                $(item).removeClass(c);
+        let now = moment().add(1, 'hour').format('HH');
+        let hour = $(item).attr('hour');
+        console.log(now, hour);
+        if (now < hour)
+            $(item).addClass('future')
+        else if (now < hour+1)
+            $(item).addClass('present');
+        else
+            $(item).addClass('past');
+    }
+    setUpdater();
+}
