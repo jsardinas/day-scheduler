@@ -1,9 +1,17 @@
 currentDayElement = $('#currentDay');
 
+var schedule = {};
+var lastActiveTextArea = null;
+
 $(document).ready(()=>{
-    var now = moment();
     
+    schedule = JSON.parse(window.localStorage.getItem('schedule'));
+    if (schedule === null)
+        schedule = {};
+
+    var now = moment();
     currentDayElement.text(now.format("dddd, MMMM Do YYYY"));
+    
     let tb = $('.time-blocks');
     for(let i = 0, hour = moment("00:00:00", "hh:mm:ss"); i < 24; ++i, hour.add(1,'hours')){
         let dayRow = $('<div>');
@@ -12,16 +20,28 @@ $(document).ready(()=>{
         let timeCol = $('<div>');
         timeCol.addClass('col-1');
         timeCol.addClass('hour');
-        // timeCol.css('border-top', '1px solid #CCC');
-        // timeCol.css('text-align', 'right');
-        // timeCol.css('padding-top', '20px');
-        timeCol.text(hour.format('hA'));
+        let timeVal = hour.format('hA') 
+        timeCol.text(timeVal);
 
         let eventCol = $('<div>');
         eventCol.addClass('col-10');
-        eventCol.css('display','flex');
         let eventInput = $('<textarea>');
-        eventInput.css('width', '100%');
+        eventInput.attr('hour', timeVal);
+        if (schedule[timeVal] !== undefined)
+            eventInput.text(schedule[timeVal]);
+
+        eventInput.focus((event)=>{
+            event.preventDefault();
+            var key;
+            var originalSchedule;
+            if (lastActiveTextArea !== null){
+                key = lastActiveTextArea.attr('hour');
+                originalSchedule = schedule[key];
+            }
+            if (lastActiveTextArea !== null && lastActiveTextArea.val() !== originalSchedule)
+                removeText(lastActiveTextArea)
+            lastActiveTextArea = $(event.target);
+        })
         
         eventCol.append(eventInput);
         
@@ -43,10 +63,31 @@ $(document).ready(()=>{
         lastCol.addClass('saveBtn');
 
         let saveIcon = $('<i>');
+        saveIcon.attr('hour', timeVal);
         saveIcon.addClass('far fa-save');
+        saveIcon.click(saveItem);
         lastCol.append(saveIcon);
 
         [timeCol, eventCol, lastCol].forEach(x=>dayRow.append(x))
         tb.append(dayRow);
     }
 });
+
+function saveItem(event){
+    let siblings = $(event.target).parent().parent().children();
+    var key = $(event.target).attr('hour');
+    var value = $(`textarea[hour=${key}]`).val();
+    schedule[key] = value;
+    window.localStorage.setItem('schedule', JSON.stringify(schedule));
+    lastActiveTextArea = null;
+}
+
+function removeText(target) {
+    console.log(target);
+    target.animate({
+      opacity: "-=1"
+    }, 1000, function() {
+        target.val('');
+        target.css('opacity', '100%');
+    });
+  }
