@@ -19,13 +19,16 @@ $(document).ready(()=>{
         let keys = Object.keys(schedule);
         var found = false;
         for(key of keys)
-            if(key == today)
+            if(key === today)
                 found = true;
-        if (!found)
+        if (!found){
             schedule[today] = {};
+        }
         else{
+            // remove all keys but today's 
+            let todayData = schedule[today];
             schedule = {};
-            schedule[today]={};
+            schedule[today] = todayData;
         }
     }
     window.localStorage.setItem('schedule', JSON.stringify(schedule));
@@ -106,7 +109,6 @@ function saveItem(event){
 }
 
 function removeText(target) {
-    console.log(target);
     target.animate({
       opacity: "-=1"
     }, 1000, function() {
