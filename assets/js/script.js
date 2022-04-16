@@ -129,7 +129,7 @@ function updateSlots(){
         for(c of cl)
             if (classList.includes(c))
                 $(item).removeClass(c);
-        let now = moment().add(1, 'hour').format('HH');
+        let now = moment().format('HH');
         let hour = $(item).attr('hour');
         console.log(now, hour);
         if (now < hour)
