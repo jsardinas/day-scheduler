@@ -2,14 +2,34 @@ currentDayElement = $('#currentDay');
 
 var schedule = {};
 var lastActiveTextArea = null;
+var today;
 
 $(document).ready(()=>{
     
-    schedule = JSON.parse(window.localStorage.getItem('schedule'));
-    if (schedule === null)
-        schedule = {};
-
     var now = moment();
+    today = now.format('YYYYMMDD');
+
+    schedule = JSON.parse(window.localStorage.getItem('schedule'));
+    if (schedule === null){
+        schedule = {};
+        schedule[today]={};
+    }
+    else{
+        let keys = Object.keys(schedule);
+        var found = false;
+        for(key of keys)
+            if(key == today)
+                found = true;
+        if (!found)
+            schedule[today] = {};
+        else{
+            schedule = {};
+            schedule[today]={};
+        }
+    }
+    console.log(schedule);
+    window.localStorage.setItem('schedule', JSON.stringify(schedule));
+   
     currentDayElement.text(now.format("dddd, MMMM Do YYYY"));
     
     let tb = $('.time-blocks');
@@ -27,8 +47,8 @@ $(document).ready(()=>{
         eventCol.addClass('col-10');
         let eventInput = $('<textarea>');
         eventInput.attr('hour', timeVal);
-        if (schedule[timeVal] !== undefined)
-            eventInput.text(schedule[timeVal]);
+        if (schedule[today][timeVal] !== undefined)
+            eventInput.text(schedule[today][timeVal]);
 
         eventInput.focus((event)=>{
             event.preventDefault();
@@ -36,7 +56,7 @@ $(document).ready(()=>{
             var originalSchedule;
             if (lastActiveTextArea !== null){
                 key = lastActiveTextArea.attr('hour');
-                originalSchedule = schedule[key];
+                originalSchedule = schedule[today][key];
             }
             if (lastActiveTextArea !== null && lastActiveTextArea.val() !== originalSchedule)
                 removeText(lastActiveTextArea)
@@ -77,7 +97,7 @@ function saveItem(event){
     let siblings = $(event.target).parent().parent().children();
     var key = $(event.target).attr('hour');
     var value = $(`textarea[hour=${key}]`).val();
-    schedule[key] = value;
+    schedule[today][key] = value;
     window.localStorage.setItem('schedule', JSON.stringify(schedule));
     lastActiveTextArea = null;
 }
