@@ -125,7 +125,6 @@ function setUpdater(){
 }
 
 function updateSlots(){
-    console.log('update');
     let eventSlots = $('.event');
     classList = ['past', 'present', 'future'];
     for(item of eventSlots){
