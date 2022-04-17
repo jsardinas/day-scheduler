@@ -34,7 +34,7 @@ $(document).ready(()=>{
     window.localStorage.setItem('schedule', JSON.stringify(schedule));
     
     let tb = $('.time-blocks');
-    for(let i = 0, hour = moment("00:00:00", "hh:mm:ss"); i < 24; ++i, hour.add(1,'hours')){
+    for(let i = 0, hour = moment("09:00:00", "hh:mm:ss"); i < 9; ++i, hour.add(1,'hours')){
         let dayRow = $('<div>');
         dayRow.addClass('row');
 
